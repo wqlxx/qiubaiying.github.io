@@ -1,66 +1,0 @@
-﻿﻿﻿﻿﻿#编译kernel 4.17.3使用的是fedora的spec文件和config文件##基础知识- 每个Fedora系统都运行着一个内核，许多代码片段组合在一起使之成为我们现在所用linux系统，每个Fedora内核都起始于一个来自于上游社区的基线版本——通常称之为 ***vanilla***内核，上游内核就是标准。  
-- 使用 vanilla 内核并不能完全满足 Fedora，然而 Vanilla 内核可能并不支持一些 Fedora 用户希望拥有的功能。用户接收的 [Fedora 内核] 是在 vanilla 内核之上打了很多补丁的内核。##编译过程中遇到的问题1. config配置时，提示出现如下问题  
-
-		Found unset config items, please set them to an appropriate value  
-		CONFIG_CHECKPOINT_RESTORE=n
-		CONFIG_CRASH=n  
-		CONFIG_DEBUG_INFO_VTA=n  
-		CONFIG_LOCK_DOWN_KERNEL=n  
-		CONFIG_LOCK_DOWN_IN_EFI_SECURE_BOOT=n  
-		CONFIG_EFI_SIGNATURE_LIST_PARSER=n 
-		CONFIG_LOCK_DOWN_MANDATORY=n  
-		CONFIG_ALLOW_LOCKDOWN_LIFT_BY_SYSRQ=n  
-		CONFIG_LOAD_UEFI_KEYS=n
-	出现问题的原因是，patch里添加的开关，没有正常添加。应该改为  
-  
-		CONFIG_CHECKPOINT_RESTORE=y  
-		CONFIG_CRASH=m  
-		CONFIG_DEBUG_INFO_VTA=y  
-		CONFIG_LOCK_DOWN_KERNEL=y  
-		CONFIG_LOCK_DOWN_IN_EFI_SECURE_BOOT=y  
-		CONFIG_EFI_SIGNATURE_LIST_PARSER=y  
-		CONFIG_LOCK_DOWN_MANDATORY=y
-		CONFIG_ALLOW_LOCKDOWN_LIFT_BY_SYSRQ=y  
-		CONFIG_LOAD_UEFI_KEYS=y
-
-
-
-1. 编译fedora的kernel时，在config的最上一行要写：  
-		# x86_64
-
-1.  解决 error creating overlay mount to /var/lib/docker/overlay2
-		
-	在网上搜索一番后，一个可行的方案如下(改变storage driver类型， 禁用selinux):
-
-	停止docker服务  
-
-		systemctl stop docker
-	清理镜像  
-
-		rm -rf /var/lib/docker
-	修改存储类型  
-
-		vi /etc/sysconfig/docker-storage
-	把空的DOCKER_STORAGE_OPTIONS参数改为overlay:
-
-		DOCKER_STORAGE_OPTIONS="--storage-driver overlay"
-	禁用selinux  
-
-		vi /etc/sysconfig/docker
-	去掉option的  
-
-		--selinux-enabled
-
-	启动docker应该就可以了
-
-		systemctl start docker
-	方案抄自 Ysssssssssssssss的博客 和 redis的讨论: error creating overlay mount to .../merged: invalid argument., 基本可以确定是启用selinux导致的。
-
-##修改spec
-	
-###如何设定版本号  	
-
-1. dist： 保存在/usr/lib/rpm/macros.d/macros.dist。  	原生的fedora是这样的			[root@258f82502eea rpmbuild]# cat /usr/lib/rpm/macros.d/macros.dist		# dist macros.		%fedora                28		%dist                .fc28		%fc28                1	修改后  			[root@258f82502eea rpmbuild]# cat /usr/lib/rpm/macros.d/macros.dist		# dist macros.		%fedora                28		%dist                .3DPro		%fc28                1	baserelease： 修改为空  		%global baserelease %{nil}
-## kernel.spec分析  
-1. process_configs.sh脚本分析		listnewconfig		
-1. mod-sign.sh对模块进行签名
