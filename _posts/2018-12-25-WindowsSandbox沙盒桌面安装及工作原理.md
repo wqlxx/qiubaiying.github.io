@@ -2,7 +2,7 @@
 Windows Sandbox是一种新型的轻量级桌面环境，专为安全运行应用程序而量身定制。你有多少次下载了一个程序，却害怕运行它？是否曾经遇到过这样的情况：需要一个干净地Windows，但又不想安装虚拟机？因此Microsoft开发了Windows Sandbox：一个独立的临时桌面环境，可以在其中运行不受信任的软件，而不必担心会对你的电脑产生致命的破坏。Windows Sandbox中安装的任何软件仅保留在沙箱中，不会影响主机。Windows Sandbox关闭后，将永久删除其中包含的所有文件、状态及软件。
 
 ## Windows Sandbox具有以下功能： ##
-　Windows的一部分 - 此功能所需的一切都随Windows 10 Pro和Enterprise一起提供。无需下载VHD！
+Windows的一部分 - 此功能所需的一切都随Windows 10 Pro和Enterprise一起提供。无需下载VHD！
 - 原始:每次Windows Sandbox运行时，它都像Windows的全新安装一样干净。
 - 一次性:设备上没有任何东西，关闭应用程序后，一切都将被丢弃。
 - 安全:使用基于硬件的虚拟化进行内核隔离，后者依靠Microsoft的虚拟机管理程序运行单独的内核，将Windows Sandbox与主机隔离开来。
@@ -28,6 +28,8 @@ Windows Sandbox是一种新型的轻量级桌面环境，专为安全运行应�
 2、启用虚拟化：如果使用的是物理机，请确保在BIOS中启用了虚拟化功能。如果使用的是虚拟机，请使用此PowerShell cmdlet启用嵌套虚拟化：  
 
 			Set-VMProcessor -VMName <VMName> -ExposeVirtualizationExtensions $ true
+
+
 3、打开Windows功能，然后选择Windows Sandbox。选择“ 确定”以安装Windows Sandbox。系统可能会要求重新启动计算机。
 　　
 
